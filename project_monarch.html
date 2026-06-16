@@ -1,0 +1,2177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Monarch — Perfect Human System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #080810;
+    --bg2: #0d0d1a;
+    --bg3: #111124;
+    --bg4: #161630;
+    --surface: #1a1a35;
+    --surface2: #20203d;
+    --border: rgba(120,100,255,0.15);
+    --border2: rgba(120,100,255,0.3);
+    --purple: #7c5cfc;
+    --purple-light: #a07cff;
+    --purple-dim: rgba(124,92,252,0.15);
+    --blue: #3b82f6;
+    --blue-dim: rgba(59,130,246,0.15);
+    --cyan: #06b6d4;
+    --gold: #f59e0b;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #e2e0f5;
+    --text2: #9490b8;
+    --text3: #5f5b88;
+    --glow: 0 0 20px rgba(124,92,252,0.3);
+    --glow-sm: 0 0 10px rgba(124,92,252,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BG */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,92,252,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,252,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 220px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar-logo {
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--purple-light);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .rank-badge {
+    margin: 12px 16px;
+    background: var(--purple-dim);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+
+  .rank-label { font-size: 10px; color: var(--text3); letter-spacing: 2px; }
+  .rank-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--purple-light);
+    text-shadow: var(--glow);
+  }
+
+  .xp-bar-wrap { margin-top: 6px; height: 3px; background: var(--bg4); border-radius: 2px; }
+  .xp-bar { height: 3px; background: linear-gradient(90deg, var(--purple), var(--blue)); border-radius: 2px; transition: width 0.6s ease; }
+  .xp-text { font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+  .nav { flex: 1; overflow-y: auto; padding: 8px 0; }
+
+  .nav-section-label {
+    padding: 12px 16px 4px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text3);
+    text-transform: uppercase;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    cursor: pointer;
+    border-radius: 0;
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+    position: relative;
+  }
+
+  .nav-item:hover { background: var(--purple-dim); color: var(--text); }
+  .nav-item.active { background: var(--purple-dim); color: var(--purple-light); border-left-color: var(--purple); }
+  .nav-icon { width: 16px; text-align: center; font-size: 14px; }
+
+  .streak-pill {
+    margin-left: auto;
+    background: var(--gold);
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  /* MAIN */
+  .main {
+    margin-left: 220px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .day-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--purple-light);
+    background: var(--purple-dim);
+    border: 1px solid var(--border2);
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+
+  .date-text { font-size: 12px; color: var(--text3); }
+
+  /* PAGE */
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--purple-light), transparent);
+    opacity: 0.4;
+  }
+
+  .card-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .card-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .card-sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border2), transparent);
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap { height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+  .fill-purple { background: linear-gradient(90deg, var(--purple), var(--purple-light)); }
+  .fill-blue { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+  .fill-gold { background: linear-gradient(90deg, var(--gold), #fbbf24); }
+  .fill-green { background: linear-gradient(90deg, var(--green), #34d399); }
+
+  /* SCORE RING */
+  .score-ring {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--purple);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--purple-light);
+    background: var(--purple-dim);
+    box-shadow: var(--glow-sm);
+  }
+
+  /* MISSION ITEMS */
+  .mission-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .mission-item:last-child { border-bottom: none; }
+
+  .mission-cb {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--border2);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: transparent;
+  }
+
+  .mission-cb.checked {
+    background: var(--purple);
+    border-color: var(--purple);
+  }
+
+  .mission-cb.checked::after {
+    content: '✓';
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .mission-text { flex: 1; }
+  .mission-label { font-size: 13px; color: var(--text); font-weight: 500; }
+  .mission-label.done { color: var(--text3); text-decoration: line-through; }
+  .mission-duration { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* XP FLASH */
+  .xp-flash {
+    position: fixed;
+    top: 60px;
+    right: 24px;
+    background: var(--purple);
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 8px;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+
+  .xp-flash.show { opacity: 1; transform: translateY(0); }
+
+  /* PILLAR CARDS */
+  .pillar-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .pillar-card:hover { border-color: var(--border2); background: var(--surface); transform: translateY(-2px); }
+
+  .pillar-icon { font-size: 24px; margin-bottom: 8px; }
+  .pillar-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .pillar-score-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .pillar-score-val { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 500; color: var(--purple-light); }
+
+  /* BTN */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-primary {
+    background: var(--purple);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(124,92,252,0.4);
+  }
+
+  .btn-primary:hover { background: var(--purple-light); transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--purple-light);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-outline:hover { background: var(--purple-dim); }
+
+  .btn-gold {
+    background: var(--gold);
+    color: #000;
+    font-weight: 700;
+  }
+
+  /* INPUT */
+  .input {
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  .input:focus { outline: none; border-color: var(--purple); }
+
+  .input-label { font-size: 11px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+
+  /* TEXTAREA */
+  textarea.input { resize: vertical; min-height: 80px; }
+
+  /* SLIDER */
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--bg4);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--purple);
+    cursor: pointer;
+    box-shadow: var(--glow-sm);
+  }
+
+  /* REPORT */
+  .report-box {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text2);
+    white-space: pre-wrap;
+    line-height: 1.8;
+  }
+
+  /* STREAK ROW */
+  .streak-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .streak-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  .streak-dot.done { background: var(--purple-dim); border-color: var(--purple); color: var(--purple-light); }
+  .streak-dot.today { border-color: var(--gold); color: var(--gold); }
+
+  /* CHALLENGE BAR */
+  .challenge-track {
+    background: var(--bg4);
+    border-radius: 6px;
+    height: 8px;
+    overflow: hidden;
+    margin: 10px 0;
+  }
+
+  .challenge-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--cyan));
+    border-radius: 6px;
+    transition: width 1s ease;
+  }
+
+  /* RANK TABLE */
+  .rank-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .rank-row:last-child { border-bottom: none; }
+
+  .rank-letter {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    width: 36px;
+  }
+
+  .rank-info { flex: 1; }
+  .rank-rname { font-size: 13px; font-weight: 600; color: var(--text); }
+  .rank-req { font-size: 11px; color: var(--text3); }
+
+  /* MOBILE HAMBURGER */
+  .hamburger {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  /* OVERLAY */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 99;
+  }
+
+  .overlay.active { display: block; }
+
+  /* MISSION PILLAR BLOCK */
+  .mission-block {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .mission-block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: var(--bg4);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mission-block-icon { font-size: 16px; }
+  .mission-block-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--purple-light);
+  }
+
+  .mission-block-pct {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+  }
+
+  .mission-block-body { padding: 0 16px; }
+
+  /* COMPLETION RING */
+  .completion-widget {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px 0;
+  }
+
+  .big-pct {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--purple-light);
+    text-shadow: var(--glow);
+    line-height: 1;
+  }
+
+  .big-pct-label { font-size: 12px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+
+  /* INPUT GROUP */
+  .input-group { margin-bottom: 16px; }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+  /* TAGS */
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .tag-purple { background: var(--purple-dim); color: var(--purple-light); border: 1px solid var(--border2); }
+  .tag-gold { background: rgba(245,158,11,0.15); color: var(--gold); border: 1px solid rgba(245,158,11,0.3); }
+  .tag-green { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .tag-red { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+  /* GLOW ACCENT ON DASHBOARD */
+  .glow-accent {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,92,252,0.1), transparent 70%);
+    pointer-events: none;
+  }
+
+  /* STAT CHANGE */
+  .change-up { color: var(--green); font-size: 11px; }
+  .change-down { color: var(--red); font-size: 11px; }
+
+  /* WEEKLY TABLE */
+  .week-table { width: 100%; border-collapse: collapse; }
+  .week-table th { text-align: left; padding: 8px 12px; font-size: 10px; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .week-table td { padding: 10px 12px; border-bottom: 1px solid rgba(120,100,255,0.06); font-size: 13px; }
+  .week-table tr:last-child td { border-bottom: none; }
+
+  /* MINI CHART */
+  .mini-chart { display: flex; align-items: flex-end; gap: 3px; height: 40px; }
+  .mini-bar { flex: 1; background: var(--purple-dim); border-radius: 2px 2px 0 0; transition: height 0.5s ease; }
+
+  /* NOTIFICATION */
+  .notif {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text);
+    z-index: 999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+    max-width: 280px;
+  }
+
+  .notif.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .hamburger { display: block; }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .page { padding: 16px; }
+    .topbar { padding: 12px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="xp-flash" id="xpFlash">+XP</div>
+<div class="notif" id="notif"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-title">⚡ PROJECT MONARCH</div>
+    <div class="logo-sub">Perfect Human System</div>
+  </div>
+
+  <div class="rank-badge">
+    <div class="rank-label">CURRENT RANK</div>
+    <div class="rank-name" id="sidebarRank">E RANK</div>
+    <div class="xp-bar-wrap"><div class="xp-bar" id="xpBar" style="width:20%"></div></div>
+    <div class="xp-text" id="xpText">120 / 500 XP</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-section-label">Command Center</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="nav-icon">⚡</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('missions')">
+      <span class="nav-icon">🎯</span> Commander Missions
+      <span class="streak-pill" id="missionPct">0%</span>
+    </div>
+    <div class="nav-item" onclick="showPage('report')">
+      <span class="nav-icon">📋</span> Daily Report
+    </div>
+
+    <div class="nav-section-label">Pillars</div>
+    <div class="nav-item" onclick="showPage('body')">
+      <span class="nav-icon">💪</span> Body
+    </div>
+    <div class="nav-item" onclick="showPage('mind')">
+      <span class="nav-icon">🧠</span> Mind
+    </div>
+    <div class="nav-item" onclick="showPage('communication')">
+      <span class="nav-icon">🗣️</span> Communication
+    </div>
+    <div class="nav-item" onclick="showPage('wealth')">
+      <span class="nav-icon">💰</span> Wealth
+    </div>
+    <div class="nav-item" onclick="showPage('skills')">
+      <span class="nav-icon">⚙️</span> Skills
+    </div>
+    <div class="nav-item" onclick="showPage('character')">
+      <span class="nav-icon">⚔️</span> Character
+    </div>
+    <div class="nav-item" onclick="showPage('purpose')">
+      <span class="nav-icon">🔥</span> Purpose
+    </div>
+
+    <div class="nav-section-label">Progress</div>
+    <div class="nav-item" onclick="showPage('weekly')">
+      <span class="nav-icon">📊</span> Weekly Review
+    </div>
+    <div class="nav-item" onclick="showPage('monthly')">
+      <span class="nav-icon">📈</span> Monthly Progress
+    </div>
+    <div class="nav-item" onclick="showPage('ranks')">
+      <span class="nav-icon">🏆</span> Rank System
+    </div>
+  </nav>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title" id="topbarTitle">DASHBOARD</div>
+    </div>
+    <div class="topbar-right">
+      <div class="day-badge" id="dayBadge">DAY 1</div>
+      <div class="date-text" id="dateText"></div>
+    </div>
+  </div>
+
+  <!-- ====== DASHBOARD ====== -->
+  <div class="page active" id="page-dashboard">
+    <div class="glow-accent" style="top:-100px;right:-100px;"></div>
+
+    <!-- Welcome Banner -->
+    <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg,var(--bg3),var(--surface))">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-size:12px;color:var(--text3);letter-spacing:2px;text-transform:uppercase">Welcome back, Commander</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--text);margin-top:2px">HARSH RAJ</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:4px">Every rep. Every session. Every day. <span style="color:var(--purple-light)">The mission continues.</span></div>
+        </div>
+        <div style="text-align:center">
+          <div class="big-pct" id="dashCompletion">0%</div>
+          <div class="big-pct-label">Today's Progress</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 75 Day Challenge -->
+    <div class="section-header">
+      <div class="section-title">75-DAY PERFECT HUMAN CHALLENGE</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="card" style="margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div>
+          <span class="tag tag-purple">ACTIVE</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text3);margin-left:8px">Started 16 Jun 2026</span>
+        </div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--gold)" id="challengeDays">Day 1 / 75</div>
+      </div>
+      <div class="challenge-track">
+        <div class="challenge-fill" id="challengeFill" style="width:1.3%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px">
+        <span style="font-size:11px;color:var(--text3)" id="challengeRemain">74 days remaining</span>
+        <span style="font-size:11px;color:var(--purple-light)" id="challengePct">1.3% complete</span>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="section-header">
+      <div class="section-title">VITAL STATS</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="grid-4" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-title">Current Weight</div>
+        <div class="card-value" id="dashWeight">54 <span style="font-size:18px;color:var(--text3)">kg</span></div>
+        <div class="card-sub">Target: 62 kg</div>
+        <div class="progress-wrap" style="margin-top:10px">
+          <div class="progress-fill fill-blue" id="weightBar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pushup Max</div>
+        <div class="card-value" id="dashPushup">20</div>
+        <div class="card-sub">Goal: 50 reps</div>
+        <div class="progress-wrap" style="margin-top:10px">
+          <div class="progress-fill fill-purple" id="pushupBar" style="width:40%"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Discipline Score</div>
+        <div class="card-value" id="dashDisc">5 <span style="font-size:18px;color:var(--text3)">/10</span></div>
+        <div class="card-sub">Keep the streak alive</div>
+        <div class="progress-wrap" style="margin-top:10px">
+          <div class="progress-fill fill-gold" id="discBar" style="width:50%"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Mission Streak</div>
+        <div class="card-value" id="dashStreak">0 🔥</div>
+        <div class="card-sub">Days in a row</div>
+      </div>
+    </div>
+
+    <!-- PILLARS OVERVIEW -->
+    <div class="section-header">
+      <div class="section-title">PILLAR SCORES</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="grid-3" style="margin-bottom:24px" id="pillarOverview"></div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="section-header">
+      <div class="section-title">QUICK ACTIONS</div>
+      <div class="section-line"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="showPage('missions')">🎯 Today's Missions</button>
+      <button class="btn btn-outline" onclick="showPage('report')">📋 Generate Report</button>
+      <button class="btn btn-outline" onclick="showPage('body')">💪 Log Workout</button>
+      <button class="btn btn-gold" onclick="showPage('weekly')">📊 Weekly Review</button>
+    </div>
+  </div>
+
+  <!-- ====== MISSIONS ====== -->
+  <div class="page" id="page-missions">
+    <div class="section-header">
+      <div class="section-title">COMMANDER MISSIONS</div>
+      <div class="section-line"></div>
+      <span class="tag tag-gold" id="missionDate"></span>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="card" style="text-align:center">
+        <div class="card-title">Today's Completion</div>
+        <div class="big-pct" id="missionCompletionPct">0%</div>
+      </div>
+      <div class="card">
+        <div class="card-title">XP Earned Today</div>
+        <div class="card-value" id="missionXP">0 <span style="font-size:16px;color:var(--purple-light)">XP</span></div>
+        <div class="card-sub" style="margin-top:8px">Complete all missions for bonus XP</div>
+      </div>
+    </div>
+
+    <div id="missionBlocks"></div>
+
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-primary" onclick="checkAllMissions()">✅ Mark All Complete</button>
+      <button class="btn btn-outline" onclick="resetMissions()">🔄 Reset Day</button>
+    </div>
+  </div>
+
+  <!-- ====== REPORT ====== -->
+  <div class="page" id="page-report">
+    <div class="section-header">
+      <div class="section-title">COMMANDER REPORT</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">End-of-Day Reflection</div>
+      <div class="grid-2" style="gap:12px;margin-bottom:12px">
+        <div class="input-group">
+          <div class="input-label">Biggest Win Today</div>
+          <input class="input" id="reportWin" placeholder="What did you crush today?">
+        </div>
+        <div class="input-group">
+          <div class="input-label">Biggest Weakness</div>
+          <input class="input" id="reportWeak" placeholder="What must improve tomorrow?">
+        </div>
+      </div>
+      <div class="input-group">
+        <div class="input-label">Notes / Reflection</div>
+        <textarea class="input" id="reportNotes" placeholder="Optional thoughts..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="generateReport()">⚡ Generate Commander Report</button>
+    </div>
+
+    <div id="reportOutput" style="display:none">
+      <div class="section-header"><div class="section-title">GENERATED REPORT</div><div class="section-line"></div></div>
+      <div class="report-box" id="reportText"></div>
+      <div style="margin-top:12px;display:flex;gap:10px">
+        <button class="btn btn-outline" onclick="copyReport()">📋 Copy Report</button>
+        <button class="btn btn-outline" onclick="saveReport()">💾 Save Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== BODY ====== -->
+  <div class="page" id="page-body">
+    <div class="section-header">
+      <div class="section-title">BODY PILLAR</div>
+      <div class="section-line"></div>
+      <span class="tag tag-purple">Foundation Phase 2026</span>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title">Weight</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input class="input" type="number" id="bodyWeight" placeholder="kg" style="width:80px" oninput="saveBodyStat('weight',this.value)">
+          <span style="color:var(--text3)">kg</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pushup Max</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input class="input" type="number" id="bodyPushup" placeholder="reps" style="width:80px" oninput="saveBodyStat('pushup',this.value)">
+          <span style="color:var(--text3)">reps</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Height</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--text)">5'5.5"</div>
+        <div class="card-sub">Height protocol active</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Body Score</div>
+        <div class="card-value" id="bodyScore">-</div>
+        <div class="card-sub">Based on completion</div>
+      </div>
+    </div>
+
+    <div class="section-header"><div class="section-title">TODAY'S WORKOUT</div><div class="section-line"></div></div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">Log Exercises</div>
+      <div id="workoutLog"></div>
+      <button class="btn btn-outline" style="margin-top:12px" onclick="addExercise()">+ Add Exercise</button>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Recovery Tracking</div>
+        <div class="input-group">
+          <div class="input-label">Sleep Hours</div>
+          <input class="input" type="number" id="bodySleep" placeholder="7" oninput="saveBodyStat('sleep',this.value)">
+        </div>
+        <div class="input-group">
+          <div class="input-label">Water Intake (litres)</div>
+          <input class="input" type="number" id="bodyWater" step="0.5" placeholder="3.0" oninput="saveBodyStat('water',this.value)">
+        </div>
+        <div class="input-group">
+          <div class="input-label">Sleep Quality (1–10)</div>
+          <input type="range" min="1" max="10" value="7" id="bodySleepQ" oninput="document.getElementById('sleepQVal').textContent=this.value;saveBodyStat('sleepQ',this.value)">
+          <div style="font-size:12px;color:var(--purple-light);margin-top:4px">Quality: <span id="sleepQVal">7</span>/10</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Diet Score</div>
+        <div class="input-group">
+          <div class="input-label">Diet Followed? (1–10)</div>
+          <input type="range" min="1" max="10" value="7" id="bodyDiet" oninput="document.getElementById('dietVal').textContent=this.value;saveBodyStat('diet',this.value)">
+          <div style="font-size:12px;color:var(--purple-light);margin-top:4px">Score: <span id="dietVal">7</span>/10</div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Notes</div>
+          <textarea class="input" id="bodyNotes" placeholder="Today's body notes..." oninput="saveBodyStat('notes',this.value)"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveBodyDay()">💾 Save Body Log</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MIND ====== -->
+  <div class="page" id="page-mind">
+    <div class="section-header">
+      <div class="section-title">MIND PILLAR</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title">Deep Work Today</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input class="input" type="number" id="mindDeepWork" placeholder="min" style="width:80px" oninput="saveMindStat('deepWork',this.value)">
+          <span style="color:var(--text3)">min</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Reading</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input class="input" type="number" id="mindRead" placeholder="pages" style="width:80px" oninput="saveMindStat('reading',this.value)">
+          <span style="color:var(--text3)">pages</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Focus Score</div>
+        <div class="input-group" style="margin-top:4px">
+          <input type="range" min="1" max="10" value="5" id="mindFocus" oninput="document.getElementById('focusVal').textContent=this.value;saveMindStat('focus',this.value)">
+          <div style="font-size:12px;color:var(--purple-light)">Score: <span id="focusVal">5</span>/10</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">Daily Journal</div>
+      <div class="grid-2" style="gap:12px">
+        <div>
+          <div class="input-label">Win of the Day</div>
+          <textarea class="input" id="mindWin" placeholder="What went well?" oninput="saveMindStat('win',this.value)"></textarea>
+        </div>
+        <div>
+          <div class="input-label">Mistake of the Day</div>
+          <textarea class="input" id="mindMistake" placeholder="What to fix?" oninput="saveMindStat('mistake',this.value)"></textarea>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="input-label">If I continue today's actions for 1 year, what happens?</div>
+        <textarea class="input" id="mindVision" placeholder="Think long-term..." oninput="saveMindStat('vision',this.value)"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="mindMeditation" onchange="saveMindStat('meditation',this.checked)">
+          <span style="font-size:13px;color:var(--text2)">Meditation done</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="mindNoPhone" onchange="saveMindStat('noPhone',this.checked)">
+          <span style="font-size:13px;color:var(--text2)">No phone first 30 min</span>
+        </label>
+      </div>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="saveMindDay()">💾 Save Mind Log</button>
+    </div>
+  </div>
+
+  <!-- ====== COMMUNICATION ====== -->
+  <div class="page" id="page-communication">
+    <div class="section-header">
+      <div class="section-title">COMMUNICATION PILLAR</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title">English Confidence</div>
+        <div class="input-group" style="margin-top:4px">
+          <input type="range" min="1" max="10" value="5" id="commEnglish" oninput="document.getElementById('engVal').textContent=this.value;saveCommStat('english',this.value)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--purple-light)"><span id="engVal">5</span><span style="font-size:16px;color:var(--text3)">/10</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Mirror Speaking</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input class="input" type="number" id="commMirror" placeholder="min" style="width:80px" oninput="saveCommStat('mirror',this.value)">
+          <span style="color:var(--text3)">min</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">New Conversations</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input class="input" type="number" id="commConvo" placeholder="0" style="width:80px" oninput="saveCommStat('convo',this.value)">
+          <span style="color:var(--text3)">today</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Practice Log</div>
+      <div class="input-group">
+        <div class="input-label">Mirror Speaking Topic</div>
+        <input class="input" id="commTopic" placeholder="e.g. My 2030 Vision" oninput="saveCommStat('topic',this.value)">
+      </div>
+      <div class="input-group">
+        <div class="input-label">Conversation Notes</div>
+        <textarea class="input" id="commNotes" placeholder="Who did you speak to? How did it go?" oninput="saveCommStat('notes',this.value)"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="commEyeContact" onchange="saveCommStat('eyeContact',this.checked)">
+          <span style="font-size:13px;color:var(--text2)">Eye contact practiced</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="commPosture" onchange="saveCommStat('posture',this.checked)">
+          <span style="font-size:13px;color:var(--text2)">Posture maintained</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="commAvoid" onchange="saveCommStat('avoid',this.checked)">
+          <span style="font-size:13px;color:var(--text2)">Avoided no conversations today</span>
+        </label>
+      </div>
+      <button class="btn btn-primary" onclick="saveCommDay()">💾 Save Communication Log</button>
+    </div>
+  </div>
+
+  <!-- ====== WEALTH ====== -->
+  <div class="page" id="page-wealth">
+    <div class="section-header">
+      <div class="section-title">WEALTH PILLAR</div>
+      <div class="section-line"></div>
+      <span class="tag tag-gold">USA AI Channel Primary</span>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title">Videos Created</div>
+        <div class="card-value" id="wealthVideos">0</div>
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px" onclick="changeVal('wealthVideoCount',-1,'wealthVideos')">−</button>
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px" onclick="changeVal('wealthVideoCount',1,'wealthVideos')">+</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Upload Streak</div>
+        <div class="card-value" id="wealthStreak">0 🔥</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Research Today</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input class="input" type="number" id="wealthResearch" placeholder="min" style="width:80px" oninput="saveWealthStat('research',this.value)">
+          <span style="color:var(--text3)">min</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Editing Today</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input class="input" type="number" id="wealthEdit" placeholder="min" style="width:80px" oninput="saveWealthStat('editing',this.value)">
+          <span style="color:var(--text3)">min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Today's Wealth Work</div>
+      <div class="grid-2" style="gap:12px;margin-bottom:12px">
+        <div>
+          <div class="input-label">Script Writing (min)</div>
+          <input class="input" type="number" id="wealthScript" placeholder="0" oninput="saveWealthStat('script',this.value)">
+        </div>
+        <div>
+          <div class="input-label">Thumbnails Created</div>
+          <input class="input" type="number" id="wealthThumb" placeholder="0" oninput="saveWealthStat('thumb',this.value)">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="wealthPublished" onchange="saveWealthStat('published',this.checked)">
+          <span style="font-size:13px;color:var(--text2)">Published a video today</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="wealthIdeas" onchange="saveWealthStat('ideas',this.checked)">
+          <span style="font-size:13px;color:var(--text2)">Researched 3+ video ideas</span>
+        </label>
+      </div>
+      <button class="btn btn-primary" onclick="saveWealthDay()">💾 Save Wealth Log</button>
+    </div>
+  </div>
+
+  <!-- ====== SKILLS ====== -->
+  <div class="page" id="page-skills">
+    <div class="section-header">
+      <div class="section-title">SKILL PILLAR</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title">Phase 1 Skills (Active)</div>
+        <div id="phase1Skills"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Phase 2 Skills (Upcoming)</div>
+        <div id="phase2Skills"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Today's Learning Log</div>
+      <div class="grid-2" style="gap:12px;margin-bottom:12px">
+        <div>
+          <div class="input-label">Skill Practiced</div>
+          <select class="input" id="skillName">
+            <option>AI Content Systems</option>
+            <option>Script Writing</option>
+            <option>Thumbnail Design</option>
+            <option>Video Editing</option>
+            <option>Communication</option>
+            <option>Python</option>
+            <option>AI Automation</option>
+            <option>Sales</option>
+            <option>Guitar</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <div class="input-label">Time Spent (minutes)</div>
+          <input class="input" type="number" id="skillTime" placeholder="60">
+        </div>
+      </div>
+      <div class="input-group">
+        <div class="input-label">What did you learn / create?</div>
+        <textarea class="input" id="skillNotes" placeholder="Summarize today's learning..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="logSkill()">+ Log Skill Session</button>
+    </div>
+
+    <div class="section-header" style="margin-top:24px"><div class="section-title">SKILL HISTORY</div><div class="section-line"></div></div>
+    <div class="card">
+      <div id="skillHistory"></div>
+    </div>
+  </div>
+
+  <!-- ====== CHARACTER ====== -->
+  <div class="page" id="page-character">
+    <div class="section-header">
+      <div class="section-title">CHARACTER PILLAR</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">Daily Character Audit</div>
+      <div id="charChecks"></div>
+      <div style="margin-top:16px">
+        <div class="input-label">Promises Made Today</div>
+        <input class="input" id="charPromisesMade" type="number" placeholder="0" oninput="saveCharStat('made',this.value)">
+      </div>
+      <div style="margin-top:12px">
+        <div class="input-label">Promises Kept Today</div>
+        <input class="input" id="charPromisesKept" type="number" placeholder="0" oninput="saveCharStat('kept',this.value)">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Night Audit</div>
+      <div class="input-group">
+        <div class="input-label">Where was character strong today?</div>
+        <textarea class="input" id="charStrong" placeholder="Write honestly..." oninput="saveCharStat('strong',this.value)"></textarea>
+      </div>
+      <div class="input-group">
+        <div class="input-label">Where did character weaken?</div>
+        <textarea class="input" id="charWeak" placeholder="No excuses, no blame." oninput="saveCharStat('weak',this.value)"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="saveCharDay()">💾 Save Character Log</button>
+    </div>
+  </div>
+
+  <!-- ====== PURPOSE ====== -->
+  <div class="page" id="page-purpose">
+    <div class="section-header">
+      <div class="section-title">PURPOSE PILLAR</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,var(--bg3),var(--surface));border-color:var(--border2)">
+      <div class="card-title">THE PERFECT HUMAN OATH</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2);line-height:2;border-left:2px solid var(--purple);padding-left:16px;margin-top:8px">
+        I will not waste my potential.<br>
+        I will build my body. I will strengthen my mind.<br>
+        I will improve my communication. I will master valuable skills.<br>
+        I will create wealth. I will develop strong character.<br>
+        I will continue moving forward even when motivation disappears.<br>
+        I will not compare myself with others.<br>
+        I will compare myself with who I was yesterday.<br>
+        <span style="color:var(--purple-light);font-weight:500">No excuses. No victim mindset. No surrender.</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">Daily Purpose Practice</div>
+      <div class="input-group">
+        <div class="input-label">5 Lines — Why Do You Want To Become Better?</div>
+        <textarea class="input" id="purposeWhy" rows="5" placeholder="Write 5 honest reasons..." oninput="savePurposeStat('why',this.value)"></textarea>
+      </div>
+      <div class="input-group">
+        <div class="input-label">Spiritual Practice (Bhagwan Naam Jap)</div>
+        <input type="range" min="0" max="10" value="0" id="purposeSpiritual" oninput="document.getElementById('spirVal').textContent=this.value;savePurposeStat('spiritual',this.value)">
+        <div style="font-size:12px;color:var(--purple-light)">Rounds: <span id="spirVal">0</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="purposeGratitude" onchange="savePurposeStat('gratitude',this.checked)">
+          <span style="font-size:13px;color:var(--text2)">Gratitude practice done</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="purposeMission" onchange="savePurposeStat('mission',this.checked)">
+          <span style="font-size:13px;color:var(--text2)">Mission reviewed</span>
+        </label>
+      </div>
+      <button class="btn btn-primary" onclick="savePurposeDay()">💾 Save Purpose Log</button>
+    </div>
+  </div>
+
+  <!-- ====== WEEKLY ====== -->
+  <div class="page" id="page-weekly">
+    <div class="section-header">
+      <div class="section-title">WEEKLY REVIEW</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title">This Week's Pillar Scores</div>
+      <table class="week-table" id="weekTable">
+        <thead>
+          <tr>
+            <th>Pillar</th>
+            <th>Score</th>
+            <th>Trend</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="weekTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Week Consistency</div>
+        <div class="big-pct" id="weekConsistency">-</div>
+        <div class="card-sub">Mission completion rate this week</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Overall Discipline Score</div>
+        <div class="big-pct" id="weekDiscipline">-</div>
+        <div class="card-sub">Based on all pillars</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MONTHLY ====== -->
+  <div class="page" id="page-monthly">
+    <div class="section-header">
+      <div class="section-title">MONTHLY PROGRESS</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title">Weight Progress</div>
+        <div class="mini-chart" id="weightChart"></div>
+        <div class="card-sub" style="margin-top:8px">54 kg → Target 62 kg</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pushup Progress</div>
+        <div class="mini-chart" id="pushupChart"></div>
+        <div class="card-sub" style="margin-top:8px">20 → Target 50</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Discipline Trend</div>
+        <div class="mini-chart" id="discChart"></div>
+        <div class="card-sub" style="margin-top:8px">7-day rolling average</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Skill Hours This Month</div>
+      <div id="monthlySkillHours"></div>
+    </div>
+  </div>
+
+  <!-- ====== RANKS ====== -->
+  <div class="page" id="page-ranks">
+    <div class="section-header">
+      <div class="section-title">RANK SYSTEM</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg,var(--bg3),var(--surface));border-color:var(--border2)">
+      <div class="card-title">Your Current Rank</div>
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:56px;font-weight:700;color:var(--purple-light);text-shadow:var(--glow)" id="currentRankDisplay">E</div>
+        <div style="font-size:16px;color:var(--text2);margin-top:4px" id="currentRankName">Developing Human</div>
+        <div style="font-size:13px;color:var(--text3);margin-top:8px" id="currentRankXP">120 XP / 500 XP to next rank</div>
+      </div>
+      <div class="xp-bar-wrap" style="height:6px"><div class="xp-bar" id="rankXpBar" style="width:24%"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">All Ranks</div>
+      <div id="rankList"></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// =====================================
+// STATE & STORAGE
+// =====================================
+const STORAGE_KEY = 'project_monarch_v1';
+
+function getState() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || getDefaultState();
+  } catch { return getDefaultState(); }
+}
+
+function getDefaultState() {
+  return {
+    xp: 120,
+    streak: 0,
+    lastActiveDate: '',
+    challengeStart: '2026-06-16',
+    weight: 54,
+    pushupMax: 20,
+    disciplineScore: 5,
+    videoCount: 0,
+    missions: {},
+    bodyLogs: {},
+    mindLogs: {},
+    commLogs: {},
+    wealthLogs: {},
+    skillLogs: [],
+    charLogs: {},
+    purposeLogs: {},
+    pillarScores: { body: 0, mind: 0, communication: 0, wealth: 0, skills: 0, character: 0, purpose: 0 },
+    reportWin: '',
+    reportWeak: '',
+  };
+}
+
+function saveState(s) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+
+let state = getState();
+
+// =====================================
+// HELPERS
+// =====================================
+function today() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function daysSince(dateStr) {
+  const start = new Date(dateStr);
+  const now = new Date();
+  return Math.floor((now - start) / 86400000) + 1;
+}
+
+function formatDate(d) {
+  return new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function showNotif(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function flashXP(amount) {
+  const el = document.getElementById('xpFlash');
+  el.textContent = '+' + amount + ' XP';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1500);
+}
+
+function addXP(amount) {
+  state.xp += amount;
+  saveState(state);
+  flashXP(amount);
+  updateSidebarRank();
+}
+
+// =====================================
+// NAVIGATION
+// =====================================
+const pageTitles = {
+  dashboard: 'DASHBOARD',
+  missions: 'COMMANDER MISSIONS',
+  report: 'COMMANDER REPORT',
+  body: 'BODY PILLAR',
+  mind: 'MIND PILLAR',
+  communication: 'COMMUNICATION PILLAR',
+  wealth: 'WEALTH PILLAR',
+  skills: 'SKILL PILLAR',
+  character: 'CHARACTER PILLAR',
+  purpose: 'PURPOSE PILLAR',
+  weekly: 'WEEKLY REVIEW',
+  monthly: 'MONTHLY PROGRESS',
+  ranks: 'RANK SYSTEM',
+};
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('topbarTitle').textContent = pageTitles[name] || name.toUpperCase();
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + name + "'")) {
+      n.classList.add('active');
+    }
+  });
+  closeSidebar();
+  if (name === 'missions') renderMissions();
+  if (name === 'weekly') renderWeekly();
+  if (name === 'monthly') renderMonthly();
+  if (name === 'skills') renderSkillHistory();
+  if (name === 'ranks') renderRanks();
+  if (name === 'dashboard') refreshDashboard();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('active');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('active');
+}
+
+// =====================================
+// RANK SYSTEM
+// =====================================
+const RANKS = [
+  { letter: 'F', name: 'Weak Human', min: 0, color: '#9490b8' },
+  { letter: 'E', name: 'Developing Human', min: 100, color: '#3b82f6' },
+  { letter: 'D', name: 'Disciplined Human', min: 500, color: '#06b6d4' },
+  { letter: 'C', name: 'Capable Human', min: 1200, color: '#10b981' },
+  { letter: 'B', name: 'Elite Human', min: 2500, color: '#f59e0b' },
+  { letter: 'A', name: 'High Value Man', min: 5000, color: '#f97316' },
+  { letter: 'S', name: 'Perfect Human Candidate', min: 10000, color: '#a07cff' },
+  { letter: 'S+', name: 'Peak Human', min: 20000, color: '#fff' },
+];
+
+function getCurrentRank() {
+  let rank = RANKS[0];
+  for (let r of RANKS) { if (state.xp >= r.min) rank = r; }
+  return rank;
+}
+
+function getNextRank() {
+  const cur = getCurrentRank();
+  const idx = RANKS.indexOf(cur);
+  return idx < RANKS.length - 1 ? RANKS[idx + 1] : null;
+}
+
+function updateSidebarRank() {
+  const rank = getCurrentRank();
+  const next = getNextRank();
+  document.getElementById('sidebarRank').textContent = rank.letter + ' RANK';
+  document.getElementById('sidebarRank').style.color = rank.color;
+  if (next) {
+    const pct = Math.min(100, ((state.xp - rank.min) / (next.min - rank.min)) * 100);
+    document.getElementById('xpBar').style.width = pct + '%';
+    document.getElementById('xpText').textContent = state.xp + ' / ' + next.min + ' XP';
+  } else {
+    document.getElementById('xpBar').style.width = '100%';
+    document.getElementById('xpText').textContent = state.xp + ' XP — MAX RANK';
+  }
+}
+
+function renderRanks() {
+  const cur = getCurrentRank();
+  const next = getNextRank();
+  document.getElementById('currentRankDisplay').textContent = cur.letter;
+  document.getElementById('currentRankDisplay').style.color = cur.color;
+  document.getElementById('currentRankName').textContent = cur.name;
+  if (next) {
+    document.getElementById('currentRankXP').textContent = state.xp + ' XP / ' + next.min + ' XP to ' + next.letter + ' Rank';
+    const pct = Math.min(100, ((state.xp - cur.min) / (next.min - cur.min)) * 100);
+    document.getElementById('rankXpBar').style.width = pct + '%';
+  }
+  const list = document.getElementById('rankList');
+  list.innerHTML = '';
+  RANKS.forEach(r => {
+    const isActive = r === cur;
+    list.innerHTML += `
+      <div class="rank-row" style="${isActive ? 'background:var(--purple-dim);border-radius:8px;padding:10px 12px' : ''}">
+        <div class="rank-letter" style="color:${r.color}">${r.letter}</div>
+        <div class="rank-info">
+          <div class="rank-rname" style="${isActive ? 'color:'+r.color : ''}">${r.name} ${isActive ? '← YOU' : ''}</div>
+          <div class="rank-req">Requires ${r.min.toLocaleString()} XP</div>
+        </div>
+        ${isActive ? '<span class="tag tag-purple">CURRENT</span>' : ''}
+      </div>`;
+  });
+}
+
+// =====================================
+// MISSIONS
+// =====================================
+const MISSION_TEMPLATES = [
+  { pillar: 'Body', icon: '💪', color: '#ef4444', items: [
+    { id: 'b1', label: 'Workout session complete', xp: 10 },
+    { id: 'b2', label: 'Running / Sprinting done', xp: 8 },
+    { id: 'b3', label: 'Drink 3 litres water', xp: 5 },
+    { id: 'b4', label: 'Height & posture routine', xp: 5 },
+    { id: 'b5', label: 'Diet followed (>7/10)', xp: 8 },
+  ]},
+  { pillar: 'Mind', icon: '🧠', color: '#7c5cfc', items: [
+    { id: 'm1', label: 'Deep work session (25+ min)', xp: 10 },
+    { id: 'm2', label: 'Read 10 pages', xp: 8 },
+    { id: 'm3', label: 'Journal completed', xp: 5 },
+    { id: 'm4', label: 'No phone for first 30 min', xp: 5 },
+  ]},
+  { pillar: 'Communication', icon: '🗣️', color: '#06b6d4', items: [
+    { id: 'c1', label: 'Mirror speaking 10 min', xp: 8 },
+    { id: 'c2', label: '1 new conversation today', xp: 8 },
+    { id: 'c3', label: 'English practice session', xp: 10 },
+  ]},
+  { pillar: 'Skill', icon: '⚙️', color: '#3b82f6', items: [
+    { id: 's1', label: 'Script writing / AI content (60 min)', xp: 15 },
+    { id: 's2', label: 'Video editing practice', xp: 10 },
+    { id: 's3', label: 'Python / AI Automation learning', xp: 15 },
+  ]},
+  { pillar: 'Wealth', icon: '💰', color: '#f59e0b', items: [
+    { id: 'w1', label: 'Research 3 video ideas', xp: 10 },
+    { id: 'w2', label: 'Create 1 thumbnail', xp: 10 },
+    { id: 'w3', label: 'Write one script / hook', xp: 12 },
+  ]},
+  { pillar: 'Character', icon: '⚔️', color: '#10b981', items: [
+    { id: 'ch1', label: 'Keep every promise made today', xp: 10 },
+    { id: 'ch2', label: 'No excuse made today', xp: 8 },
+    { id: 'ch3', label: 'Did the right thing, not the easy thing', xp: 8 },
+  ]},
+  { pillar: 'Purpose', icon: '🔥', color: '#a07cff', items: [
+    { id: 'p1', label: 'Spiritual practice (Naam Jap)', xp: 8 },
+    { id: 'p2', label: 'Write 5 lines — why you want to be better', xp: 8 },
+    { id: 'p3', label: 'Mission reviewed', xp: 5 },
+  ]},
+];
+
+function getMissionState() {
+  return state.missions[today()] || {};
+}
+
+function renderMissions() {
+  const ms = getMissionState();
+  const container = document.getElementById('missionBlocks');
+  container.innerHTML = '';
+  let totalItems = 0, doneItems = 0;
+  MISSION_TEMPLATES.forEach(block => {
+    let blockDone = 0;
+    const itemsHtml = block.items.map(item => {
+      totalItems++;
+      const checked = !!ms[item.id];
+      if (checked) { doneItems++; blockDone++; }
+      return `
+        <div class="mission-item" onclick="toggleMission('${item.id}', ${item.xp})">
+          <div class="mission-cb ${checked ? 'checked' : ''}" id="cb_${item.id}"></div>
+          <div class="mission-text">
+            <div class="mission-label ${checked ? 'done' : ''}" id="ml_${item.id}">${item.label}</div>
+            <div class="mission-duration">+${item.xp} XP</div>
+          </div>
+        </div>`;
+    }).join('');
+    const pct = Math.round((blockDone / block.items.length) * 100);
+    container.innerHTML += `
+      <div class="mission-block">
+        <div class="mission-block-header">
+          <span class="mission-block-icon" style="color:${block.color}">${block.icon}</span>
+          <span class="mission-block-title" style="color:${block.color}">${block.pillar} Mission</span>
+          <span class="mission-block-pct">${blockDone}/${block.items.length}</span>
+        </div>
+        <div class="mission-block-body">${itemsHtml}</div>
+      </div>`;
+  });
+  updateMissionStats(doneItems, totalItems);
+}
+
+function toggleMission(id, xp) {
+  if (!state.missions[today()]) state.missions[today()] = {};
+  const cur = !!state.missions[today()][id];
+  state.missions[today()][id] = !cur;
+  saveState(state);
+  if (!cur) addXP(xp);
+  const cb = document.getElementById('cb_' + id);
+  const ml = document.getElementById('ml_' + id);
+  if (cb) cb.classList.toggle('checked', !cur);
+  if (ml) ml.classList.toggle('done', !cur);
+  recalcMissionStats();
+}
+
+function recalcMissionStats() {
+  const ms = getMissionState();
+  let total = 0, done = 0;
+  MISSION_TEMPLATES.forEach(b => b.items.forEach(i => { total++; if (ms[i.id]) done++; }));
+  updateMissionStats(done, total);
+}
+
+function updateMissionStats(done, total) {
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  if (document.getElementById('missionCompletionPct')) {
+    document.getElementById('missionCompletionPct').textContent = pct + '%';
+  }
+  document.getElementById('missionPct').textContent = pct + '%';
+  const totalXP = MISSION_TEMPLATES.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.xp, 0), 0);
+  const ms = getMissionState();
+  let earnedXP = 0;
+  MISSION_TEMPLATES.forEach(b => b.items.forEach(i => { if (ms[i.id]) earnedXP += i.xp; }));
+  if (document.getElementById('missionXP')) document.getElementById('missionXP').textContent = earnedXP;
+  const dashEl = document.getElementById('dashCompletion');
+  if (dashEl) dashEl.textContent = pct + '%';
+}
+
+function checkAllMissions() {
+  if (!state.missions[today()]) state.missions[today()] = {};
+  let xpAdded = 0;
+  MISSION_TEMPLATES.forEach(b => b.items.forEach(i => {
+    if (!state.missions[today()][i.id]) {
+      state.missions[today()][i.id] = true;
+      xpAdded += i.xp;
+    }
+  }));
+  state.xp += xpAdded;
+  saveState(state);
+  updateSidebarRank();
+  renderMissions();
+  showNotif('All missions marked complete! +' + xpAdded + ' XP');
+}
+
+function resetMissions() {
+  state.missions[today()] = {};
+  saveState(state);
+  renderMissions();
+  showNotif('Missions reset for today.');
+}
+
+// =====================================
+// BODY PILLAR
+// =====================================
+const defaultExercises = [
+  { name: 'Pushups', sets: 4, reps: 10 },
+  { name: 'Squats', sets: 4, reps: 15 },
+  { name: 'Plank', sets: 3, duration: '45 sec' },
+  { name: 'Running', duration: '20 min' },
+];
+
+function renderWorkoutLog() {
+  const log = state.bodyLogs[today()] || {};
+  const exercises = log.exercises || defaultExercises;
+  const container = document.getElementById('workoutLog');
+  container.innerHTML = exercises.map((ex, i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div class="mission-cb ${log['ex_'+i] ? 'checked' : ''}" onclick="toggleExercise(${i})" style="cursor:pointer"></div>
+      <span style="flex:1;font-size:13px;color:var(--text)">${ex.name} ${ex.sets ? ex.sets+'×'+ex.reps : ex.duration || ''}</span>
+    </div>`).join('');
+}
+
+function toggleExercise(i) {
+  if (!state.bodyLogs[today()]) state.bodyLogs[today()] = {};
+  state.bodyLogs[today()]['ex_' + i] = !state.bodyLogs[today()]['ex_' + i];
+  saveState(state);
+  renderWorkoutLog();
+}
+
+function addExercise() {
+  const name = prompt('Exercise name (e.g. Pull-ups 3×8):');
+  if (!name) return;
+  if (!state.bodyLogs[today()]) state.bodyLogs[today()] = {};
+  if (!state.bodyLogs[today()].exercises) state.bodyLogs[today()].exercises = [...defaultExercises];
+  state.bodyLogs[today()].exercises.push({ name, custom: true });
+  saveState(state);
+  renderWorkoutLog();
+}
+
+function saveBodyStat(key, val) {
+  if (!state.bodyLogs[today()]) state.bodyLogs[today()] = {};
+  state.bodyLogs[today()][key] = val;
+  if (key === 'weight') { state.weight = parseFloat(val) || state.weight; }
+  if (key === 'pushup') { state.pushupMax = parseInt(val) || state.pushupMax; }
+  saveState(state);
+}
+
+function saveBodyDay() {
+  addXP(15);
+  state.pillarScores.body = Math.min(100, (state.pillarScores.body || 0) + 5);
+  saveState(state);
+  showNotif('Body log saved! +15 XP');
+}
+
+function changeVal(stateKey, delta, displayId) {
+  state[stateKey] = Math.max(0, (state[stateKey] || 0) + delta);
+  document.getElementById(displayId).textContent = state[stateKey];
+  saveState(state);
+}
+
+// =====================================
+// MIND
+// =====================================
+function saveMindStat(key, val) {
+  if (!state.mindLogs[today()]) state.mindLogs[today()] = {};
+  state.mindLogs[today()][key] = val;
+  saveState(state);
+}
+
+function saveMindDay() {
+  addXP(12);
+  state.pillarScores.mind = Math.min(100, (state.pillarScores.mind || 0) + 5);
+  saveState(state);
+  showNotif('Mind log saved! +12 XP');
+}
+
+// =====================================
+// COMMUNICATION
+// =====================================
+function saveCommStat(key, val) {
+  if (!state.commLogs[today()]) state.commLogs[today()] = {};
+  state.commLogs[today()][key] = val;
+  saveState(state);
+}
+
+function saveCommDay() {
+  addXP(10);
+  state.pillarScores.communication = Math.min(100, (state.pillarScores.communication || 0) + 5);
+  saveState(state);
+  showNotif('Communication log saved! +10 XP');
+}
+
+// =====================================
+// WEALTH
+// =====================================
+function saveWealthStat(key, val) {
+  if (!state.wealthLogs[today()]) state.wealthLogs[today()] = {};
+  state.wealthLogs[today()][key] = val;
+  saveState(state);
+}
+
+function saveWealthDay() {
+  addXP(15);
+  state.pillarScores.wealth = Math.min(100, (state.pillarScores.wealth || 0) + 5);
+  saveState(state);
+  showNotif('Wealth log saved! +15 XP');
+}
+
+// =====================================
+// SKILLS
+// =====================================
+const PHASE1 = ['AI Content Systems','Script Writing','Thumbnail Design','Video Editing','Communication'];
+const PHASE2 = ['Python','AI Automation','Systems Thinking','Sales'];
+
+function renderPhaseSkills() {
+  const p1 = document.getElementById('phase1Skills');
+  const p2 = document.getElementById('phase2Skills');
+  if (!p1 || !p2) return;
+  p1.innerHTML = PHASE1.map(s => `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span style="color:var(--text)">⚡ ${s}</span>
+      <span class="tag tag-green">Active</span>
+    </div>`).join('');
+  p2.innerHTML = PHASE2.map(s => `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span style="color:var(--text2)">⏳ ${s}</span>
+      <span class="tag tag-purple">Phase 2</span>
+    </div>`).join('');
+}
+
+function logSkill() {
+  const name = document.getElementById('skillName').value;
+  const time = parseInt(document.getElementById('skillTime').value) || 0;
+  const notes = document.getElementById('skillNotes').value;
+  if (!time) { showNotif('Enter time spent!'); return; }
+  state.skillLogs.push({ date: today(), name, time, notes });
+  state.pillarScores.skills = Math.min(100, (state.pillarScores.skills || 0) + 3);
+  addXP(15);
+  saveState(state);
+  document.getElementById('skillTime').value = '';
+  document.getElementById('skillNotes').value = '';
+  showNotif(name + ' logged! +15 XP');
+  renderSkillHistory();
+}
+
+function renderSkillHistory() {
+  const container = document.getElementById('skillHistory');
+  if (!container) return;
+  const logs = [...state.skillLogs].reverse().slice(0, 10);
+  if (!logs.length) { container.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:16px 0">No skill sessions logged yet. Start today.</div>'; return; }
+  container.innerHTML = logs.map(l => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span class="tag tag-purple" style="flex-shrink:0">${l.name}</span>
+      <span style="font-size:13px;color:var(--text2);flex:1">${l.notes || '—'}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text3)">${l.time}min · ${l.date}</span>
+    </div>`).join('');
+}
+
+// =====================================
+// CHARACTER
+// =====================================
+const CHAR_CHECKS = [
+  'Did I keep my word today?',
+  'Did I take responsibility (no blaming)?',
+  'Did I face discomfort without quitting?',
+  'Did I maintain self-respect?',
+  'Was I honest today?',
+];
+
+function renderCharChecks() {
+  const container = document.getElementById('charChecks');
+  if (!container) return;
+  const log = state.charLogs[today()] || {};
+  container.innerHTML = CHAR_CHECKS.map((q, i) => `
+    <div class="mission-item" onclick="toggleCharCheck(${i})">
+      <div class="mission-cb ${log['q'+i] ? 'checked' : ''}" id="chcb_${i}"></div>
+      <div class="mission-label ${log['q'+i] ? 'done' : ''}" id="chml_${i}">${q}</div>
+    </div>`).join('');
+}
+
+function toggleCharCheck(i) {
+  if (!state.charLogs[today()]) state.charLogs[today()] = {};
+  state.charLogs[today()]['q'+i] = !state.charLogs[today()]['q'+i];
+  saveState(state);
+  renderCharChecks();
+}
+
+function saveCharStat(key, val) {
+  if (!state.charLogs[today()]) state.charLogs[today()] = {};
+  state.charLogs[today()][key] = val;
+  saveState(state);
+}
+
+function saveCharDay() {
+  addXP(10);
+  state.pillarScores.character = Math.min(100, (state.pillarScores.character || 0) + 5);
+  saveState(state);
+  showNotif('Character log saved! +10 XP');
+}
+
+// =====================================
+// PURPOSE
+// =====================================
+function savePurposeStat(key, val) {
+  if (!state.purposeLogs[today()]) state.purposeLogs[today()] = {};
+  state.purposeLogs[today()][key] = val;
+  saveState(state);
+}
+
+function savePurposeDay() {
+  addXP(10);
+  state.pillarScores.purpose = Math.min(100, (state.pillarScores.purpose || 0) + 5);
+  saveState(state);
+  showNotif('Purpose log saved! +10 XP');
+}
+
+// =====================================
+// REPORT
+// =====================================
+function generateReport() {
+  const ms = getMissionState();
+  let total = 0, done = 0;
+  const sectionReports = MISSION_TEMPLATES.map(block => {
+    const lines = block.items.map(i => {
+      total++;
+      const ok = !!ms[i.id];
+      if (ok) done++;
+      return `  ${ok ? '✅' : '❌'} ${i.label}`;
+    }).join('\n');
+    return `${block.icon} ${block.pillar.toUpperCase()}\n${lines}`;
+  }).join('\n\n');
+
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const day = daysSince(state.challengeStart);
+  const win = document.getElementById('reportWin').value || '—';
+  const weak = document.getElementById('reportWeak').value || '—';
+  const disc = Math.round((pct / 10));
+
+  const report = `═══════════════════════════════
+PROJECT MONARCH — DAY ${day} REPORT
+${new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}
+═══════════════════════════════
+
+${sectionReports}
+
+═══════════════════════════════
+OVERALL COMPLETION: ${pct}%
+DISCIPLINE SCORE:   ${disc}/10
+MISSIONS DONE:      ${done}/${total}
+
+BIGGEST WIN:
+  ${win}
+
+BIGGEST WEAKNESS:
+  ${weak}
+
+XP EARNED TODAY:    ${state.xp} XP TOTAL
+CURRENT RANK:       ${getCurrentRank().letter} — ${getCurrentRank().name}
+═══════════════════════════════
+"Every day, become slightly stronger than yesterday."
+`;
+
+  document.getElementById('reportText').textContent = report;
+  document.getElementById('reportOutput').style.display = 'block';
+}
+
+function copyReport() {
+  navigator.clipboard.writeText(document.getElementById('reportText').textContent);
+  showNotif('Report copied to clipboard!');
+}
+
+function saveReport() {
+  showNotif('Report saved to log!');
+}
+
+// =====================================
+// WEEKLY REVIEW
+// =====================================
+function renderWeekly() {
+  const pillars = ['body','mind','communication','wealth','skills','character','purpose'];
+  const icons = { body:'💪', mind:'🧠', communication:'🗣️', wealth:'💰', skills:'⚙️', character:'⚔️', purpose:'🔥' };
+  const tbody = document.getElementById('weekTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = pillars.map(p => {
+    const score = state.pillarScores[p] || 0;
+    const status = score >= 60 ? '<span class="tag tag-green">Strong</span>' : score >= 30 ? '<span class="tag tag-gold">Building</span>' : '<span class="tag tag-red">Needs Work</span>';
+    return `
+      <tr>
+        <td>${icons[p]} ${p.charAt(0).toUpperCase() + p.slice(1)}</td>
+        <td><span style="font-family:'JetBrains Mono';font-size:13px;color:var(--purple-light)">${score}</span></td>
+        <td>
+          <div class="mini-chart" style="height:20px;width:80px">
+            ${[...Array(7)].map((_,i) => `<div class="mini-bar" style="height:${20+i*5}%;background:var(--purple-dim)"></div>`).join('')}
+          </div>
+        </td>
+        <td>${status}</td>
+      </tr>`;
+  }).join('');
+
+  const ms = getMissionState();
+  let total = 0, done = 0;
+  MISSION_TEMPLATES.forEach(b => b.items.forEach(i => { total++; if (ms[i.id]) done++; }));
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('weekConsistency').textContent = pct + '%';
+  document.getElementById('weekDiscipline').textContent = Math.round(pct / 10) + '/10';
+}
+
+// =====================================
+// MONTHLY
+// =====================================
+function renderMonthly() {
+  const charts = ['weightChart', 'pushupChart', 'discChart'];
+  charts.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const vals = [40, 50, 55, 60, 65, 70, 80, 85].map(v => v + Math.random() * 10);
+    const max = Math.max(...vals);
+    el.innerHTML = vals.map(v => `<div class="mini-bar" style="height:${(v/max)*100}%;background:linear-gradient(to top,var(--purple),var(--purple-light))"></div>`).join('');
+  });
+
+  const skillsContainer = document.getElementById('monthlySkillHours');
+  if (!skillsContainer) return;
+  const skillTotals = {};
+  state.skillLogs.forEach(l => { skillTotals[l.name] = (skillTotals[l.name] || 0) + l.time; });
+  if (!Object.keys(skillTotals).length) {
+    skillsContainer.innerHTML = '<div style="color:var(--text3);font-size:13px">No skill sessions logged yet.</div>';
+    return;
+  }
+  const maxMin = Math.max(...Object.values(skillTotals));
+  skillsContainer.innerHTML = Object.entries(skillTotals).map(([name, min]) => `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:13px;color:var(--text)">${name}</span>
+        <span style="font-family:'JetBrains Mono';font-size:12px;color:var(--purple-light)">${min} min</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-fill fill-purple" style="width:${(min/maxMin)*100}%"></div></div>
+    </div>`).join('');
+}
+
+// =====================================
+// DASHBOARD
+// =====================================
+function renderPillarOverview() {
+  const container = document.getElementById('pillarOverview');
+  if (!container) return;
+  const pillars = [
+    { name: 'Body', icon: '💪', key: 'body' },
+    { name: 'Mind', icon: '🧠', key: 'mind' },
+    { name: 'Communication', icon: '🗣️', key: 'communication' },
+    { name: 'Wealth', icon: '💰', key: 'wealth' },
+    { name: 'Skills', icon: '⚙️', key: 'skills' },
+    { name: 'Character', icon: '⚔️', key: 'character' },
+    { name: 'Purpose', icon: '🔥', key: 'purpose' },
+  ];
+  container.innerHTML = pillars.map(p => {
+    const score = state.pillarScores[p.key] || 0;
+    return `
+      <div class="pillar-card" onclick="showPage('${p.key}')">
+        <div class="pillar-icon">${p.icon}</div>
+        <div class="pillar-name">${p.name}</div>
+        <div class="pillar-score-row">
+          <div class="pillar-score-val">${score}</div>
+          <span style="font-size:11px;color:var(--text3)">/100</span>
+        </div>
+        <div class="progress-wrap"><div class="progress-fill fill-purple" style="width:${score}%"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function refreshDashboard() {
+  // Challenge
+  const day = daysSince(state.challengeStart);
+  const safeDayNum = Math.max(1, Math.min(day, 75));
+  document.getElementById('dayBadge').textContent = 'DAY ' + safeDayNum;
+  document.getElementById('challengeDays').textContent = 'Day ' + safeDayNum + ' / 75';
+  const pct = Math.min(100, (safeDayNum / 75) * 100);
+  document.getElementById('challengeFill').style.width = pct + '%';
+  document.getElementById('challengeRemain').textContent = Math.max(0, 75 - safeDayNum) + ' days remaining';
+  document.getElementById('challengePct').textContent = pct.toFixed(1) + '% complete';
+
+  // Date
+  document.getElementById('dateText').textContent = formatDate(new Date());
+  document.getElementById('missionDate').textContent = formatDate(new Date());
+
+  // Stats
+  const w = state.weight || 54;
+  const p = state.pushupMax || 20;
+  document.getElementById('dashWeight').innerHTML = w + ' <span style="font-size:18px;color:var(--text3)">kg</span>';
+  document.getElementById('dashPushup').textContent = p;
+  document.getElementById('dashDisc').innerHTML = state.disciplineScore + ' <span style="font-size:18px;color:var(--text3)">/10</span>';
+  document.getElementById('dashStreak').textContent = state.streak + ' 🔥';
+  const wPct = Math.min(100, ((w - 54) / (62 - 54)) * 100);
+  document.getElementById('weightBar').style.width = Math.max(0, wPct) + '%';
+  document.getElementById('pushupBar').style.width = Math.min(100, (p / 50) * 100) + '%';
+  document.getElementById('discBar').style.width = (state.disciplineScore * 10) + '%';
+
+  renderPillarOverview();
+  recalcMissionStats();
+}
+
+// =====================================
+// INIT
+// =====================================
+function init() {
+  updateSidebarRank();
+  refreshDashboard();
+  renderWorkoutLog();
+  renderCharChecks();
+  renderPhaseSkills();
+
+  // Load saved inputs
+  const bl = state.bodyLogs[today()] || {};
+  if (bl.weight && document.getElementById('bodyWeight')) document.getElementById('bodyWeight').value = bl.weight;
+  if (bl.pushup && document.getElementById('bodyPushup')) document.getElementById('bodyPushup').value = bl.pushup;
+  if (bl.sleep && document.getElementById('bodySleep')) document.getElementById('bodySleep').value = bl.sleep;
+  if (bl.water && document.getElementById('bodyWater')) document.getElementById('bodyWater').value = bl.water;
+
+  document.getElementById('wealthVideos').textContent = state.wealthVideoCount || 0;
+  document.getElementById('wealthStreak').textContent = (state.wealthUploadStreak || 0) + ' 🔥';
+}
+
+init();
+</script>
+</body>
+</html>
